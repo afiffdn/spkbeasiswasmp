@@ -22,7 +22,11 @@ class Users extends ResourceController
      */
     public function index()
     {
-        //
+        $data = [
+            'message' => 'succes',
+            'data' => $this->usersModel->findAll()
+        ];
+        return $this->respond($data, 200);
     }
 
     /**
@@ -79,6 +83,9 @@ class Users extends ResourceController
         if (!$users) {
             return $this->failNotFound('user tidak terdaftar');
         }
+        if ($users['is_active'] == 0) {
+            return $this->failNotFound("user belum aktif");
+        }
         $db = \Config\Database::connect();
         $check = $db->table('tb_users')->where('username', $users['username'])->get()->getRow()->password;
         $password = password_verify($this->request->getVar('password'), $check);
@@ -86,15 +93,14 @@ class Users extends ResourceController
         if (!$password) {
             return $this->failNotFound('password salah');
         }
-
-
         $key = getenv('TOKEN_SECRET');
         $payload = [
             'iss' => 'http://example.org',
             'aud' => 'http://example.com',
             'iat' => time(),
             'exp' => time() + (60 * 60),
-            'id_users' => $users['id_users']
+            'id' => $users['id_users'],
+            'sebagai' => $users['sebagai']
         ];
         $token = JWT::encode($payload, $key, 'HS256');
 
@@ -102,6 +108,23 @@ class Users extends ResourceController
             'token' => $token
         ];
         return $this->respond($data);
+    }
+
+    public function changeRegistData($id = null)
+    {
+        if (!$this->validation($id)) return $this->fail($this->validator->getErrors());
+        $data = [
+            'username' => $this->request->getVar('username'),
+            'password' => password_hash($this->request->getVar('password'), PASSWORD_BCRYPT),
+            'sebagai' => $this->request->getVar("sebagai")
+        ];
+        $this->usersModel->update($id, $data);
+        $response = [
+            'message' => [
+                'success' => 'data berhasil diubah'
+            ]
+        ];
+        return $this->respondUpdated($response);
     }
 
     /**
@@ -121,7 +144,17 @@ class Users extends ResourceController
      */
     public function update($id = null)
     {
-        //
+
+        $data = [
+            'is_active' => 1
+        ];
+        $this->usersModel->update($id, $data);
+        $response = [
+            'message' => [
+                'success' => 'data berhasil diubah'
+            ]
+        ];
+        return $this->respondUpdated($response);
     }
 
     /**

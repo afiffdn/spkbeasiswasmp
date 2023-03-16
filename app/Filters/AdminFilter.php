@@ -5,11 +5,15 @@ namespace App\Filters;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\RESTful\ResourceController;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-class Auth implements FilterInterface
+class AdminFilter implements FilterInterface
 {
+    use ResponseTrait;
+    protected $format = 'json';
     /**
      * Do whatever processing this filter needs to do.
      * By default it should not return anything during
@@ -27,32 +31,7 @@ class Auth implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        $key = getenv('TOKEN_SECRET');
-        $header = $request->getServer('HTTP_AUTHORIZATION');
-        if (!$header) {
-            $response = service('response');
-            $response->setJSON([
-                'status' => false,
-                'message' => 'Weeeh login dulu'
-            ]);
-            return $response->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
-        }
-        try {
-            $token = explode(' ', $header)[1];
-            $decoded = JWT::decode($token, new Key($key, 'HS256'));
-            $response = [
-                'id'    => $decoded->id,
-                'sebagai' => $decoded->sebagai,
-            ];
-            return $response;
-        } catch (\Exception $e) {
-            $response = service('response');
-            $response->setJSON([
-                'status' => false,
-                'message' => 'Token invalid' . $e->getMessage(),
-            ]);
-            return $response->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
-        }
+        //
     }
 
     /**
@@ -69,6 +48,28 @@ class Auth implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        //
+        $key = getenv('TOKEN_SECRET');
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        if (!$header) return $this->failUnauthorized('Token required');
+        $token = explode(' ', $header)[1];
+
+        try {
+            $decoded = JWT::decode($token, new Key($key, 'HS256'));
+            $response = [
+                'id'          => $decoded->id,
+                'sebagai'    => $decoded->sebagai,
+            ];
+            $admin = $this->respond($response['sebagai']);
+        } catch (\Exception $th) {
+            return $this->fail('Invalid Tokean');
+        }
+        if ($admin != 'admin') {
+            return redirect()->to('error');
+        }
+    }
+
+
+    private function user()
+    {
     }
 }

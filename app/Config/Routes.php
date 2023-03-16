@@ -3,6 +3,8 @@
 namespace Config;
 
 use App\Controllers\Pelajaran;
+use App\Controllers\Profile;
+
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -32,18 +34,41 @@ $routes->set404Override();
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 
-$routes->get('/pelajaran', 'Pelajaran::index', ['filter' => 'auth']);
+$routes->get('/pelajaran', 'Pelajaran::index');
 $routes->get('/pelajaran/(:num)', 'Pelajaran::show/$1');
 $routes->post('/pelajaran', 'Pelajaran::create');
 $routes->put('/pelajaran/(:num)', 'Pelajaran::update/$1');
 $routes->delete('/pelajaran/(:num)', 'Pelajaran::delete/$1');
 // $routes->resource('pelajaran', [Pelajaran::class]);
+$routes->resource('profile', [Profile::class]);
 
 //registration
-$routes->post('/users', 'Users::create');
+$routes->get('/users', 'Users::index');
+$routes->post('/register', 'Users::create');
 $routes->post('/login', 'Users::login');
+$routes->put('/login-activated/(:num)', 'Users::update/$1');
 
+//change regist data
+$routes->put('/users/(:num)', 'Users::changeRegistData/$1');
 
+//datadiri
+$routes->post('/datadiri-siswa', 'DataDiriController::create');
+$routes->get('/datadiri-siswa', 'DataDiriController::indexSiswa');
+$routes->put('/datadiri-siswa/(:num)', 'DataDiriController::update/$1');
+$routes->post('/datadiri-admin', 'DataDiriController::create');
+$routes->get('/datadiri-admin', 'DataDiriController::index');
+$routes->put('/datadiri-admin/(:num)', 'DataDiriController::update/$1');
+
+//nilai
+$routes->post('/siswa-nilai', 'NilaiController::create');
+$routes->put('/siswa-nilai/(:num)', 'NilaiController::update/$1');
+$routes->get('/siswa-nilai', 'NilaiController::getNilai');
+$routes->get('/admin-nilai', 'NilaiController::index');
+$routes->get('/nilai-min-max', 'NilaiController::minMax');
+
+//detail
+// $routes->get('/admin-detail-siswa', 'NilaiController::getDetail');
+$routes->get('/admin-detail-siswa/(:num)', 'NilaiController::getDetail/$1');
 
 /*
  * --------------------------------------------------------------------

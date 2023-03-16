@@ -23,7 +23,9 @@ class Filters extends BaseConfig
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'auth'          => \App\Filters\Auth::class,
-        'cors'          => \App\Filters\Cors::class
+        'cors'          => \App\Filters\Cors::class,
+        'admin'          => \App\Filters\AdminFilter::class,
+        'siswa'          => \App\Filters\SiswaFilter::class
     ];
 
     /**
@@ -35,12 +37,21 @@ class Filters extends BaseConfig
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
-            'cors'
+            'cors',
+            'auth' => [
+                'except' => ['login', 'register']
+            ],
         ],
         'after' => [
             'toolbar',
             // 'honeypot',
             // 'secureheaders',
+            // 'admin' => [
+            //     'except' => ['pelajaran']
+            // ],
+            // 'siswa' => [
+            //     'except' => []
+            // ]
         ],
     ];
 

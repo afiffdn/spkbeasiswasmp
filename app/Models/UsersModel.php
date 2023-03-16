@@ -10,6 +10,6 @@ class UsersModel extends Model
     protected $primaryKey       = 'id_users';
     protected $useAutoIncrement = true;
     protected $useSoftDeletes   = true;
-    protected $allowedFields    = ['username', 'password', 'sebagai'];
+    protected $allowedFields    = ['username', 'password', 'sebagai', 'is_active'];
     protected $useTimestamps = true;
 }

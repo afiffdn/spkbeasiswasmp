@@ -11,7 +11,7 @@ class Tabelusers extends Migration
         $this->forge->addField([
             'id_users' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true,],
             'username' => ['type' => 'VARCHAR', 'constraint' => 50,],
-            'password' => ['type' => 'VARCHAR', 'constraint' => 50,],
+            'password' => ['type' => 'VARCHAR', 'constraint' => 225,],
             'sebagai' => ['type' => 'VARCHAR', 'constraint' => 50,],
             'created_at' => ['type' => 'datetime', 'null' => true,],
             'updated_at' => ['type' => 'datetime', 'null' => true,],
